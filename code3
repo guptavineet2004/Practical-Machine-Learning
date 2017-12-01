@@ -1,0 +1,81 @@
+install.packages('caret')
+install.packages('e1071')
+install.packages('randomForest')
+install.packages("ElemStatLearn")
+library(randomForest)
+library(caret)
+library(e1071)
+library(ElemStatLearn)
+
+##IMPORTING TRAINING AND TEST DATASET
+
+training <- read.csv("C:\\Users\\vineet.e.gupta\\Desktop\\certification\\pml-training.csv")
+testing <- read.csv("C:\\Users\\vineet.e.gupta\\Desktop\\certification\\pml-testing.csv")
+
+##CONVERTING TARGET VARIABLE TO A FACTOR VARIABLE
+training$classe=as.factor(training$classe)
+
+set.seed(1111)
+
+# MISSING VALUE IDENTIFICATION
+
+################# Option1 ###############
+missing=lapply(training, function(x) sum(is.na(x)))
+
+################# Option2 ###############
+install.packages("funModeling")
+library(funModeling)
+df_status(training)
+
+## Since the percentage of missing values in the selected variables below is more than 97%, they should be removed completely
+
+training1 <- training[,-c(18,19,21,22,24,25,27:36,50:59,75:83,93,94,96,97,99,100,103:112,131,132,134,135,137,138,141:150)]
+
+training1[training1==""] <- NA
+df_status(training1)
+
+training2 <- training1[,-c(1,2,12:20,43:48,52:60,74:82)]
+
+##EXPORTING THE RESULTANT SUMMARY TO MATCH THE VARIABLE TYPE FOR TRAINING AND TEST SAMPLE
+h <-data.frame(df_status(training2))
+i<- data.frame(df_status(testing2 ))
+
+write.csv(h,"C:\\Users\\vineet.e.gupta\\Desktop\\certification\\train.csv")
+write.csv(i,"C:\\Users\\vineet.e.gupta\\Desktop\\certification\\test.csv")
+
+## Fitting a Random Forest on training Data
+
+model_rf=randomForest(factor(classe)~.,data=training2)
+
+model_rf$predicted
+ 
+## Checking Prediction Accuracy
+
+confusionMatrix(training2$classe,model_rf$predicted)
+
+
+## Preparing Test data set similar to Training Dataset
+testing1 <- testing[,-c(18,19,21,22,24,25,27:36,50:59,75:83,93,94,96,97,99,100,103:112,131,132,134,135,137,138,141:150)]
+testing1 [testing1 ==""] <- NA
+testing2 <- testing1 [,-c(1,2,12:20,43:48,52:60,74:82,93)]
+
+h <-data.frame(df_status(training2))
+i<- data.frame(df_status(testing2 ))
+
+write.csv(h,"C:\\Users\\vineet.e.gupta\\Desktop\\certification\\train.csv")
+write.csv(i,"C:\\Users\\vineet.e.gupta\\Desktop\\certification\\test.csv")
+
+##Converting Test data variable similar to variables in training dataset
+
+testing2$magnet_dumbbell_z <-as.numeric(testing2$magnet_dumbbell_z)
+testing2$magnet_forearm_y <-as.numeric(testing2$magnet_forearm_y)
+testing2$magnet_forearm_z <-as.numeric(testing2$magnet_forearm_z)
+
+## Bringing Factor variables of training and test dataset to similar levels
+
+levels(testing2$cvtd_timestamp) <-levels(training2$cvtd_timestamp)
+levels(testing2$new_window) <-levels(training2$new_window)
+
+
+prediction=predict(model_rf,testing2)
+
