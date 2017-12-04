@@ -1,0 +1,12 @@
+Since the exercise was aimed at identifying the exercise pattern which had more than 1 possible values, So I have used Random Forest for it. 
+To create the model, initially exploratory data analysis was done to check any missing values present in the data. Since at checking the count of 
+missing values present was even more than 97% in some of the variables, those variables were completely removed from the analysis. Rest the 
+model was created using all the varaibles which were left after the missing values removal. To check the uniformity of the two Datasets- Testing and
+training, we used a package called "funmodeling" which tells the type of varaible. On check, there were a couple of variables which were not 
+having similar datatypes, So we converted them to the relevant data type because the prediction would not take place if the variables in the testing 
+and training datasets are of different types.
+
+Also for two variables, the data type was same but the levels of the variable was not similar in the two datasets. If levels of the two datasets 
+are not matched it doesnot let us do the predictions. 
+
+This was the model was built using all the variables which had non null values applying Random forest.
